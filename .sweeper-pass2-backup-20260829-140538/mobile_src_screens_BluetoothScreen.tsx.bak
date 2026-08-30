@@ -1,0 +1,82 @@
+import React, {useState} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Body, Card, PrimaryButton, Screen, SecondaryButton, Subtitle, Title, palette} from '../components/ui';
+import {scanBluetooth} from '../services/bluetoothScanner';
+import type {BleDeviceFinding} from '../types';
+
+function signalLabel(rssi: number | null) {
+  if (rssi == null) return 'Unknown';
+  if (rssi >= -50) return 'Very strong';
+  if (rssi >= -65) return 'Strong';
+  if (rssi >= -80) return 'Medium';
+  return 'Weak';
+}
+
+export function BluetoothScreen({
+  initial,
+  onContinue,
+  onBack,
+}: {
+  initial: BleDeviceFinding[];
+  onContinue: (devices: BleDeviceFinding[]) => void;
+  onBack: () => void;
+}) {
+  const [devices, setDevices] = useState(initial);
+  const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(initial.length);
+  const [error, setError] = useState('');
+
+  const scan = async () => {
+    setLoading(true);
+    setError('');
+    setCount(0);
+    try {
+      const found = await scanBluetooth(undefined, setCount);
+      setDevices(found);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Screen>
+      <ScrollView>
+        <Title>Bluetooth sweep</Title>
+        <Body>Nearby BLE devices are collected for a short window. RSSI is only a rough signal-strength indicator; it is not a precise distance measurement.</Body>
+        <PrimaryButton title={devices.length ? 'SCAN AGAIN' : 'START 8-SECOND BLE SCAN'} onPress={scan} loading={loading} />
+        {loading ? <Text style={styles.progress}>Scanning… {count} unique device(s)</Text> : null}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        {devices.map(device => (
+          <Card key={device.id}>
+            <View style={styles.row}>
+              <Subtitle>{device.name || 'Unnamed BLE device'}</Subtitle>
+              <Text style={device.suspicionScore >= 10 ? styles.flag : styles.ok}>
+                {device.suspicionScore >= 10 ? 'REVIEW' : signalLabel(device.rssi)}
+              </Text>
+            </View>
+            <Body>Signal: {device.rssi ?? 'n/a'} dBm · {signalLabel(device.rssi)}</Body>
+            {device.serviceUUIDs.length ? <Body>Services: {device.serviceUUIDs.slice(0, 4).join(', ')}</Body> : null}
+            {device.reasons.map(reason => <Text key={reason} style={styles.reason}>• {reason}</Text>)}
+          </Card>
+        ))}
+
+        {!loading && devices.length === 0 ? <Card><Body>No Bluetooth results yet. A device can still exist without advertising over BLE.</Body></Card> : null}
+
+        <PrimaryButton title="CONTINUE TO PHYSICAL SWEEP" onPress={() => onContinue(devices)} disabled={loading} />
+        <SecondaryButton title="Back" onPress={onBack} />
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  progress: {color: palette.accent, fontWeight: '700', marginVertical: 12},
+  error: {color: palette.danger, marginVertical: 12},
+  row: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  flag: {color: palette.warning, fontWeight: '900', fontSize: 12},
+  ok: {color: palette.accent, fontWeight: '800', fontSize: 12},
+  reason: {color: palette.text, fontSize: 14, lineHeight: 21, marginTop: 4},
+});

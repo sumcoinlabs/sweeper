@@ -1,0 +1,146 @@
+import React, {useMemo, useState} from 'react';
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {Body, Card, PrimaryButton, Screen, SecondaryButton, Subtitle, Title, palette} from '../components/ui';
+import {detectLocation} from '../services/location';
+import type {LocationInfo} from '../types';
+
+export function LocationScreen({
+  initial,
+  onContinue,
+  onBack,
+}: {
+  initial: LocationInfo | null;
+  onContinue: (location: LocationInfo) => void;
+  onBack: () => void;
+}) {
+  const [location, setLocation] = useState<LocationInfo | null>(initial);
+  const [name, setName] = useState(initial?.name || '');
+  const [address, setAddress] = useState(initial?.address || '');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const area = useMemo(() => {
+    if (!location) return '';
+    return [location.locality, location.administrativeArea, location.country]
+      .filter(Boolean)
+      .join(', ');
+  }, [location]);
+
+  const detect = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const found = await detectLocation();
+      setLocation(found);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to get your location.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const save = () => {
+    if (!location) return;
+    onContinue({...location, name: name.trim(), address: address.trim()});
+  };
+
+  return (
+    <Screen>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+        <View>
+          <Title>Where are you sweeping?</Title>
+          <Body>
+            Location lets Sweeper group reports from the same hotel, rental, or property. GPS is the important part; the property details below are optional.
+          </Body>
+        </View>
+
+        <PrimaryButton
+          title={location ? 'REFRESH CURRENT LOCATION' : 'USE MY CURRENT LOCATION'}
+          onPress={detect}
+          loading={loading}
+        />
+
+        {error ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorTitle}>Location unavailable</Text>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        {location ? (
+          <Card style={styles.locationCard}>
+            <View style={styles.locationHeader}>
+              <Subtitle>Location captured</Subtitle>
+              <Text style={styles.ready}>READY</Text>
+            </View>
+            {area ? <Text style={styles.area}>{area}</Text> : null}
+            <Text style={styles.coords}>{location.lat.toFixed(5)}, {location.lng.toFixed(5)}</Text>
+            {location.accuracy ? <Body>Accuracy about {Math.round(location.accuracy)} m</Body> : null}
+          </Card>
+        ) : null}
+
+        <View style={styles.form}>
+          <Text style={styles.label}>Property name <Text style={styles.optional}>(optional)</Text></Text>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Example Hotel, Airbnb, Room 214"
+            placeholderTextColor={palette.muted}
+            style={styles.input}
+            autoCapitalize="words"
+          />
+
+          <Text style={styles.label}>Street address <Text style={styles.optional}>(optional)</Text></Text>
+          <TextInput
+            value={address}
+            onChangeText={setAddress}
+            placeholder="123 Main St, Boise, ID"
+            placeholderTextColor={palette.muted}
+            style={styles.input}
+            autoCapitalize="words"
+          />
+          <Text style={styles.helper}>
+            Add these only when they help identify the exact property. Sweeper still records the GPS location.
+          </Text>
+        </View>
+
+        <View style={styles.actions}>
+          <PrimaryButton title="CONTINUE" onPress={save} disabled={!location} />
+          {!location ? <Text style={styles.needLocation}>Capture a location to continue.</Text> : null}
+          <SecondaryButton title="Back" onPress={onBack} />
+        </View>
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {flexGrow: 1, paddingTop: 10, paddingBottom: 12},
+  errorBox: {backgroundColor: '#24171a', borderColor: '#5b2a31', borderWidth: 1, borderRadius: 14, padding: 14, marginTop: 12},
+  errorTitle: {color: palette.danger, fontWeight: '800', fontSize: 14, marginBottom: 4},
+  errorText: {color: '#f1a0a0', fontSize: 13, lineHeight: 19},
+  locationCard: {marginTop: 14, marginBottom: 4},
+  locationHeader: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  ready: {color: palette.accent, fontSize: 11, fontWeight: '900', letterSpacing: 1},
+  area: {color: palette.text, fontSize: 15, fontWeight: '700', marginBottom: 5},
+  coords: {color: palette.muted, fontSize: 13, marginBottom: 4},
+  form: {marginTop: 10},
+  label: {color: palette.text, fontSize: 14, fontWeight: '800', marginBottom: 7, marginTop: 14},
+  optional: {color: palette.muted, fontWeight: '600'},
+  input: {
+    backgroundColor: palette.panel,
+    borderColor: palette.border,
+    borderWidth: 1,
+    borderRadius: 14,
+    color: palette.text,
+    minHeight: 54,
+    paddingHorizontal: 14,
+    fontSize: 15,
+  },
+  helper: {color: palette.muted, fontSize: 12, lineHeight: 18, marginTop: 9},
+  actions: {marginTop: 10},
+  needLocation: {color: palette.muted, fontSize: 12, textAlign: 'center', marginTop: 8},
+});

@@ -1,0 +1,82 @@
+import React, {useEffect, useRef, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {Camera, useCameraDevice} from 'react-native-vision-camera';
+import {PrimaryButton, SecondaryButton, palette} from '../components/ui';
+import type {EvidencePhoto} from '../types';
+
+export function CameraAssistScreen({
+  onPhoto,
+  onDone,
+}: {
+  onPhoto: (photo: EvidencePhoto) => void;
+  onDone: () => void;
+}) {
+  const cameraRef = useRef<Camera>(null);
+  const [permission, setPermission] = useState(false);
+  const [message, setMessage] = useState('');
+  const [useFront, setUseFront] = useState(false);
+  const device = useCameraDevice(useFront ? 'front' : 'back');
+
+  useEffect(() => {
+    Camera.requestCameraPermission().then(status => setPermission(status === 'granted'));
+  }, []);
+
+  const takePhoto = async () => {
+    if (!cameraRef.current) return;
+    try {
+      const photo = await cameraRef.current.takePhoto({flash: 'off'});
+      onPhoto({path: photo.path, createdAt: new Date().toISOString()});
+      setMessage('Evidence photo saved to this sweep.');
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  if (!permission) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.title}>Camera permission is required for lens assist.</Text>
+        <PrimaryButton title="REQUEST CAMERA PERMISSION" onPress={async () => setPermission((await Camera.requestCameraPermission()) === 'granted')} />
+        <SecondaryButton title="Back to checklist" onPress={onDone} />
+      </View>
+    );
+  }
+
+  if (!device) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.title}>No camera is available on this device.</Text>
+        <SecondaryButton title="Back to checklist" onPress={onDone} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Camera ref={cameraRef} style={StyleSheet.absoluteFill} device={device} isActive photo />
+      <View style={styles.overlayTop}>
+        <Text style={styles.heading}>LENS / IR ASSIST</Text>
+        <Text style={styles.help}>Darken the room if practical and inspect suspicious objects for tiny reflections or unexpected bright points. Bright points alone are not proof of a camera.</Text>
+      </View>
+      <View style={styles.reticle} />
+      <View style={styles.controls}>
+        {message ? <Text style={styles.message}>{message}</Text> : null}
+        <PrimaryButton title="CAPTURE EVIDENCE PHOTO" onPress={takePhoto} />
+        <SecondaryButton title={useFront ? 'Use rear camera' : 'Use front camera'} onPress={() => setUseFront(value => !value)} />
+        <SecondaryButton title="Back to checklist" onPress={onDone} />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {flex: 1, backgroundColor: '#000'},
+  center: {flex: 1, backgroundColor: palette.bg, alignItems: 'stretch', justifyContent: 'center', padding: 24},
+  title: {color: palette.text, fontSize: 20, fontWeight: '800', textAlign: 'center', marginBottom: 16},
+  overlayTop: {position: 'absolute', top: 50, left: 20, right: 20, backgroundColor: 'rgba(5,8,12,0.75)', borderRadius: 16, padding: 14},
+  heading: {color: palette.accent, fontWeight: '900', letterSpacing: 2},
+  help: {color: palette.text, fontSize: 13, lineHeight: 19, marginTop: 6},
+  reticle: {position: 'absolute', width: 130, height: 130, borderWidth: 2, borderColor: 'rgba(255,255,255,0.85)', borderRadius: 65, left: '50%', top: '45%', marginLeft: -65, marginTop: -65},
+  controls: {position: 'absolute', left: 20, right: 20, bottom: 28, backgroundColor: 'rgba(5,8,12,0.78)', borderRadius: 18, padding: 14},
+  message: {color: palette.accent, textAlign: 'center', fontWeight: '700'},
+});

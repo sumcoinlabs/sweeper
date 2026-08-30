@@ -1,0 +1,76 @@
+import React, {useState} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Body, Card, PrimaryButton, Screen, SecondaryButton, Subtitle, Title, palette} from '../components/ui';
+import {scanLocalNetwork} from '../services/networkScanner';
+import type {NetworkDevice} from '../types';
+
+export function NetworkScreen({
+  initial,
+  onContinue,
+  onBack,
+}: {
+  initial: NetworkDevice[];
+  onContinue: (devices: NetworkDevice[]) => void;
+  onBack: () => void;
+}) {
+  const [devices, setDevices] = useState(initial);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState('');
+  const [error, setError] = useState('');
+
+  const scan = async () => {
+    setLoading(true);
+    setError('');
+    setProgress('Preparing local scan…');
+    try {
+      const results = await scanLocalNetwork(p => {
+        setProgress(`${Math.round((p.completed / p.total) * 100)}% · ${p.foundHosts} host(s) responding`);
+      });
+      setDevices(results);
+      setProgress(`Complete · ${results.length} host(s) found`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Screen>
+      <ScrollView>
+        <Title>Local network sweep</Title>
+        <Body>This tests a limited set of ports on your current private Wi-Fi subnet. It does not log in to devices, retrieve content or claim that an open port proves a camera exists.</Body>
+        <PrimaryButton title={devices.length ? 'SCAN AGAIN' : 'START NETWORK SCAN'} onPress={scan} loading={loading} />
+        {progress ? <Text style={styles.progress}>{progress}</Text> : null}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        {devices.map(device => (
+          <Card key={device.ip}>
+            <View style={styles.row}>
+              <Subtitle>{device.ip}</Subtitle>
+              <Text style={device.suspicionScore >= 20 ? styles.flag : styles.ok}>
+                {device.suspicionScore >= 20 ? 'REVIEW' : 'FOUND'}
+              </Text>
+            </View>
+            <Body>Open ports: {device.openPorts.join(', ')}</Body>
+            {device.reasons.map(reason => <Text key={reason} style={styles.reason}>• {reason}</Text>)}
+          </Card>
+        ))}
+
+        {!loading && devices.length === 0 ? <Card><Body>No scan results yet. You must be on the same Wi-Fi network as the devices you want Sweeper to test.</Body></Card> : null}
+
+        <PrimaryButton title="CONTINUE TO BLUETOOTH" onPress={() => onContinue(devices)} disabled={loading} />
+        <SecondaryButton title="Back" onPress={onBack} />
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  progress: {color: palette.accent, fontWeight: '700', marginVertical: 12},
+  error: {color: palette.danger, marginVertical: 12},
+  row: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  flag: {color: palette.warning, fontWeight: '900', fontSize: 12},
+  ok: {color: palette.accent, fontWeight: '900', fontSize: 12},
+  reason: {color: palette.text, fontSize: 14, lineHeight: 21, marginTop: 4},
+});

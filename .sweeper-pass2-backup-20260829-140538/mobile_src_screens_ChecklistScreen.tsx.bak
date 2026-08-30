@@ -1,0 +1,72 @@
+import React from 'react';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Body, Card, PrimaryButton, Screen, SecondaryButton, Subtitle, Title, palette} from '../components/ui';
+import type {ChecklistItem, ChecklistStatus} from '../types';
+
+export function ChecklistScreen({
+  items,
+  onChange,
+  onOpenCamera,
+  onContinue,
+  onBack,
+}: {
+  items: ChecklistItem[];
+  onChange: (items: ChecklistItem[]) => void;
+  onOpenCamera: () => void;
+  onContinue: () => void;
+  onBack: () => void;
+}) {
+  const setStatus = (id: string, status: ChecklistStatus) => {
+    onChange(items.map(item => item.id === id ? {...item, status} : item));
+  };
+
+  const complete = items.filter(item => item.status !== 'pending').length;
+
+  return (
+    <Screen>
+      <ScrollView>
+        <Title>Guided physical sweep</Title>
+        <Body>Work through the highest-value hiding locations. Do not dismantle electrical, fire-safety or building equipment.</Body>
+        <Text style={styles.progress}>{complete}/{items.length} checks completed</Text>
+
+        {items.map(item => (
+          <Card key={item.id}>
+            <View style={styles.row}>
+              <Subtitle>{item.title}</Subtitle>
+              <Text style={item.status === 'suspicious' ? styles.suspicious : item.status === 'clear' ? styles.clear : styles.pending}>
+                {item.status.toUpperCase()}
+              </Text>
+            </View>
+            {item.guidance.map(line => <Text style={styles.guidance} key={line}>• {line}</Text>)}
+            <View style={styles.actions}>
+              <Pressable onPress={() => setStatus(item.id, 'clear')} style={[styles.choice, item.status === 'clear' && styles.choiceClear]}>
+                <Text style={styles.choiceText}>Nothing found</Text>
+              </Pressable>
+              <Pressable onPress={() => setStatus(item.id, 'suspicious')} style={[styles.choice, item.status === 'suspicious' && styles.choiceSuspicious]}>
+                <Text style={styles.choiceText}>Suspicious</Text>
+              </Pressable>
+            </View>
+          </Card>
+        ))}
+
+        <SecondaryButton title="OPEN LENS / CAMERA ASSIST" onPress={onOpenCamera} />
+        <PrimaryButton title="REVIEW SWEEP" onPress={onContinue} />
+        <SecondaryButton title="Back" onPress={onBack} />
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  progress: {color: palette.accent, fontWeight: '800', marginVertical: 14},
+  row: {flexDirection: 'row', justifyContent: 'space-between', gap: 12},
+  clear: {color: palette.accent, fontWeight: '900', fontSize: 11},
+  suspicious: {color: palette.warning, fontWeight: '900', fontSize: 11},
+  pending: {color: palette.muted, fontWeight: '900', fontSize: 11},
+  guidance: {color: palette.text, lineHeight: 21, marginTop: 3},
+  actions: {flexDirection: 'row', gap: 10, marginTop: 14},
+  choice: {flex: 1, borderWidth: 1, borderColor: palette.border, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 8, alignItems: 'center'},
+  choiceClear: {borderColor: palette.accent, backgroundColor: '#102a26'},
+  choiceSuspicious: {borderColor: palette.warning, backgroundColor: '#2b2416'},
+  choiceText: {color: palette.text, fontWeight: '700', fontSize: 12},
+});

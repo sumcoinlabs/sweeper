@@ -1,0 +1,38 @@
+import React from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Body, Card, PrimaryButton, Screen, Subtitle, Title, palette} from '../components/ui';
+
+export function HomeScreen({onStart}: {onStart: () => void}) {
+  return (
+    <Screen>
+      <ScrollView contentContainerStyle={styles.content}>
+        <View>
+          <Text style={styles.brand}>SWEEPER</Text>
+          <Title>Check your room for signs of unwanted surveillance.</Title>
+          <Body>Sweeper combines local-network analysis, Bluetooth discovery, guided physical inspection and camera-assisted documentation. It does not claim that an unknown device is automatically a camera.</Body>
+        </View>
+
+        <Card>
+          <Subtitle>What this sweep checks</Subtitle>
+          <Text style={styles.item}>• Nearby LAN services associated with embedded/camera hardware</Text>
+          <Text style={styles.item}>• Nearby Bluetooth devices and signal strength</Text>
+          <Text style={styles.item}>• Common physical hiding locations</Text>
+          <Text style={styles.item}>• Photos of anything you decide is suspicious</Text>
+        </Card>
+
+        <Card>
+          <Subtitle>Privacy first</Subtitle>
+          <Body>No paid cloud detection API is required. The scan stays on-device until you choose to submit it to the self-hosted Sweeper backend.</Body>
+        </Card>
+
+        <PrimaryButton title="START A SWEEP" onPress={onStart} />
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {flexGrow: 1, justifyContent: 'space-between', paddingBottom: 12},
+  brand: {color: palette.accent, fontWeight: '900', letterSpacing: 4, marginBottom: 12},
+  item: {color: palette.text, fontSize: 15, lineHeight: 25},
+});

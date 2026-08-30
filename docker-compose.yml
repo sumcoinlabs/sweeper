@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sweeper
+      POSTGRES_USER: sweeper
+      POSTGRES_PASSWORD: sweeper_dev_only
+    ports:
+      - "5432:5432"
+    volumes:
+      - sweeper_pg:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sweeper -d sweeper"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  sweeper_pg:
