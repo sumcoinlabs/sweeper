@@ -38,7 +38,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Sweeper uses the camera to help inspect suspicious objects and capture evidence photos.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Sweeper checks reachable services on the Wi-Fi network you are currently using.</string>
+	<string>Sweeper uses the local network to discover nearby devices and services that may help identify cameras or other network equipment.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Sweeper uses your location to tag the property being swept.</string>
 	<key>RCTNewArchEnabled</key>
@@ -62,5 +62,20 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_bonjour._tcp</string>
+		<string>_lnp._tcp</string>
+		<string>_http._tcp</string>
+		<string>_https._tcp</string>
+		<string>_rtsp._tcp</string>
+		<string>_hap._tcp</string>
+		<string>_axis-video._tcp</string>
+		<string>_axis-nvr._tcp</string>
+		<string>_vapix-http._tcp</string>
+		<string>_vapix-https._tcp</string>
+		<string>_googlecast._tcp</string>
+		<string>_airplay._tcp</string>
+	</array>
 </dict>
 </plist>

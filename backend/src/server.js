@@ -60,9 +60,27 @@ function sanitizeBle(devices = []) {
 
 function sanitizeNetwork(devices = []) {
   return devices.map(device => ({
-    ip: device.ip,
-    openPorts: Array.isArray(device.openPorts) ? device.openPorts.map(Number) : [],
-    reasons: Array.isArray(device.reasons) ? device.reasons : [],
+    ip: String(device.ip || ''),
+    hostname: device.hostname ? String(device.hostname) : null,
+    openPorts: Array.isArray(device.openPorts)
+      ? device.openPorts.map(Number).filter(Number.isFinite)
+      : [],
+    bonjourServices: Array.isArray(device.bonjourServices)
+      ? device.bonjourServices.map(service => ({
+          type: String(service.type || ''),
+          name: String(service.name || ''),
+          hostname: service.hostname ? String(service.hostname) : null,
+          port: Number.isFinite(Number(service.port))
+            ? Number(service.port)
+            : null,
+        }))
+      : [],
+    discoverySources: Array.isArray(device.discoverySources)
+      ? device.discoverySources.filter(source =>
+          ['tcp', 'mdns'].includes(source),
+        )
+      : [],
+    reasons: Array.isArray(device.reasons) ? device.reasons.map(String) : [],
     suspicionScore: Number(device.suspicionScore || 0),
   }));
 }

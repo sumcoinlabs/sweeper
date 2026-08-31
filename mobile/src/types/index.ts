@@ -18,9 +18,19 @@ export type LocationInfo = {
   country: string;
 };
 
+export type BonjourServiceFinding = {
+  type: string;
+  name: string;
+  hostname?: string;
+  port?: number;
+};
+
 export type NetworkDevice = {
   ip: string;
+  hostname?: string;
   openPorts: number[];
+  bonjourServices?: BonjourServiceFinding[];
+  discoverySources?: Array<'tcp' | 'mdns'>;
   suspicionScore: number;
   reasons: string[];
 };

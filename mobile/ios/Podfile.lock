@@ -1,4 +1,28 @@
 PODS:
+  - BonjourZeroconf (2.2.0):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - boost (1.84.0):
     - ReactNativeDependencies
   - CocoaAsyncSocket (7.6.5)
@@ -1827,6 +1851,7 @@ PODS:
     - React-Core-prebuilt
 
 DEPENDENCIES:
+  - "BonjourZeroconf (from `../node_modules/@dawidzawada/bonjour-zeroconf`)"
   - boost (from `build/rndeps-facades/boost`)
   - DoubleConversion (from `build/rndeps-facades/DoubleConversion`)
   - fast_float (from `build/rndeps-facades/fast_float`)
@@ -1929,6 +1954,8 @@ SPEC REPOS:
     - MultiplatformBleAdapter
 
 EXTERNAL SOURCES:
+  BonjourZeroconf:
+    :path: "../node_modules/@dawidzawada/bonjour-zeroconf"
   boost:
     :path: build/rndeps-facades/boost
   DoubleConversion:
@@ -2120,6 +2147,7 @@ EXTERNAL SOURCES:
     :path: build/rncore-facades/Yoga
 
 SPEC CHECKSUMS:
+  BonjourZeroconf: 88fee09568b8367f4fff8f33988693fa32204ae7
   boost: 2a9d6e1d9873337543f08d9dbc007b288f4e113b
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: e85e4faac763226bfd1cc4c6a98d8355149b27a5

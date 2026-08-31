@@ -4,6 +4,13 @@ const CAMERA_NAME_HINTS = [
 ];
 
 const CAMERA_PORTS = new Set([554, 8554, 37777, 34567]);
+const CAMERA_MDNS_TYPES = new Set([
+  '_rtsp._tcp',
+  '_axis-video._tcp',
+  '_axis-nvr._tcp',
+  '_vapix-http._tcp',
+  '_vapix-https._tcp',
+]);
 const EMBEDDED_PORTS = new Set([8000, 8080, 8899]);
 
 export function calculateRisk(input = {}) {
@@ -38,6 +45,21 @@ export function calculateRisk(input = {}) {
 
     if (ports.includes(80) || ports.includes(443)) {
       score += 1;
+    }
+
+    const mdnsCameraServices = Array.isArray(device.bonjourServices)
+      ? device.bonjourServices.filter(service =>
+          CAMERA_MDNS_TYPES.has(String(service?.type || '')),
+        )
+      : [];
+
+    if (mdnsCameraServices.length > 0 && cameraPorts.length === 0) {
+      score += 28;
+      reasons.push(
+        `LAN host ${device.hostname || device.ip || 'unknown'} advertises camera/video Bonjour service(s): ${[
+          ...new Set(mdnsCameraServices.map(service => service.type)),
+        ].join(', ')}`,
+      );
     }
   }
 

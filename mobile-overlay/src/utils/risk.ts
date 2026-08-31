@@ -1,6 +1,13 @@
 import type {SweepSession, RiskResult} from '../types';
 
 const cameraPorts = new Set([554, 8554, 37777, 34567]);
+const cameraMdnsTypes = new Set([
+  '_rtsp._tcp',
+  '_axis-video._tcp',
+  '_axis-nvr._tcp',
+  '_vapix-http._tcp',
+  '_vapix-https._tcp',
+]);
 const embeddedPorts = new Set([8000, 8080, 8899]);
 const cameraNameHints = [
   'camera',
@@ -45,6 +52,19 @@ export function calculateRisk(session: SweepSession): RiskResult {
 
     if (device.openPorts.includes(80) || device.openPorts.includes(443)) {
       score += 1;
+    }
+
+    const mdnsCameraServices = (device.bonjourServices || []).filter(service =>
+      cameraMdnsTypes.has(service.type),
+    );
+
+    if (mdnsCameraServices.length && associated.length === 0) {
+      score += 28;
+      reasons.push(
+        `${device.hostname || device.ip} advertises camera/video Bonjour service(s): ${[
+          ...new Set(mdnsCameraServices.map(service => service.type)),
+        ].join(', ')}`,
+      );
     }
   }
 
