@@ -1,7 +1,10 @@
 .DS_Store
 .env
 node_modules/
-mobile/
 backend/uploads/*
 !backend/uploads/.gitkeep
 *.log
+.milestone*-backup*/
+.sweeper-*-backup*/
+.milestone1-hardware-fix-*/
+.milestone*-hardware-fix-*/

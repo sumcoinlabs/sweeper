@@ -40,14 +40,14 @@ TODO - SSDP/UPnP
 TODO - Service fingerprinting
 TODO - Manufacturer fingerprints
 TODO - IEEE OUI integration where platform permits
-TODO - Physical-iPhone validation
+DONE - Physical-iPhone execution validated
 
 ## Bluetooth
 
 PARTIAL - BLE scanner implemented
 PARTIAL - RSSI scoring
 PARTIAL - Name-based camera hints
-TODO - Physical-iPhone validation
+DONE - Physical-iPhone execution validated
 TODO - Manufacturer-data fingerprints
 TODO - Service-UUID fingerprints
 TODO - Larger camera-device fingerprint database
@@ -81,8 +81,8 @@ DONE - Reports schema
 DONE - Photo schema
 DONE - Server-side risk calculation
 DONE - BLE identifier hashing
-PARTIAL - Mobile submission
-PARTIAL - Evidence upload
+DONE - Mobile scan submission to backend
+DONE - Evidence photo upload to backend
 TODO - Full report classification workflow
 TODO - Verified-report workflow
 
@@ -153,4 +153,4 @@ TODO - Pre-launch legal review
 
 ## Current milestone
 
-NEXT: Milestone 1 - Physical iPhone validation.
+COMPLETE: Milestone 1 - Physical iPhone validation.\n\nNEXT: Milestone 2 - Wi-Fi discovery and device fingerprinting.

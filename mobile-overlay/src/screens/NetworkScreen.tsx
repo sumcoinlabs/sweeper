@@ -116,9 +116,9 @@ export function NetworkScreen({
               not a guarantee that the room is camera-free.
             </Body>
             <Text style={styles.simulatorNote}>
-              Simulator testing is useful for the flow and UI, but real Wi-Fi
-              discovery must be validated on a physical iPhone connected to the
-              target network.
+              This first-pass scan checks only a small service-port set. A
+              device can be present without exposing one of these ports. Deeper
+              Bonjour/mDNS and SSDP discovery is the next network milestone.
             </Text>
           </Card>
         ) : null}

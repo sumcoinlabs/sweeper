@@ -36,7 +36,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor={palette.bg} />
+      <StatusBar barStyle="light-content" />
       {step === 'home' && <HomeScreen onStart={() => setStep('location')} />}
       {step === 'location' && (
         <LocationScreen
