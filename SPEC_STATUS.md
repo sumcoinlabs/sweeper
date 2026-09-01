@@ -30,27 +30,33 @@ DONE - Manual address entry removed from product direction
 
 ## Wi-Fi detection
 
-PARTIAL - Local IPv4 detection
-PARTIAL - Private /24 scanning
+DONE - Local IPv4 detection
+DONE - Private /24 scanning
+DONE - Native ICMP-assisted host discovery
 DONE - Safe TCP connection probes
-DONE - Camera-associated port scoring
-TODO - Better host discovery
-TODO - mDNS/Bonjour
-TODO - SSDP/UPnP
-TODO - Service fingerprinting
-TODO - Manufacturer fingerprints
-TODO - IEEE OUI integration where platform permits
+DONE - Bonjour/mDNS discovery
+PARTIAL - SSDP/UPnP (implemented; physical iOS multicast entitlement dependent)
+DONE - HTTP/RTSP service fingerprinting
+DONE - Evidence-based camera/video classification
+PARTIAL - Manufacturer/OUI fingerprints where platform APIs permit
+DONE - Consumer-safe Wi-Fi caution UI
+DONE - Exportable Wi-Fi evidence
 DONE - Physical-iPhone execution validated
 
 ## Bluetooth
 
-PARTIAL - BLE scanner implemented
-PARTIAL - RSSI scoring
-PARTIAL - Name-based camera hints
-DONE - Physical-iPhone execution validated
-TODO - Manufacturer-data fingerprints
-TODO - Service-UUID fingerprints
-TODO - Larger camera-device fingerprint database
+IN PROGRESS - Milestone 3 BLE detection depth
+DONE - Physical-iPhone BLE execution previously validated
+IMPLEMENTED FOR TEST - Repeated RSSI sampling/proximity bands
+IMPLEMENTED FOR TEST - Advertised/local names
+IMPLEMENTED FOR TEST - Service UUID and service-data UUID capture
+IMPLEMENTED FOR TEST - Manufacturer-data/company-ID extraction
+IMPLEMENTED FOR TEST - Local camera/security vendor fingerprint database
+IMPLEMENTED FOR TEST - Evidence-based BLE assessment
+IMPLEMENTED FOR TEST - Privacy-preserving backend BLE sanitization
+IMPLEMENTED FOR TEST - Consumer-safe Bluetooth caution UI
+IMPLEMENTED FOR TEST - Exportable Bluetooth evidence
+PENDING - Milestone 3 physical validation
 
 ## Physical detection
 
@@ -153,4 +159,21 @@ TODO - Pre-launch legal review
 
 ## Current milestone
 
-COMPLETE: Milestone 1 - Physical iPhone validation.\n\nNEXT: Milestone 2 - Wi-Fi discovery and device fingerprinting.
+COMPLETE: Milestone 2 - Wi-Fi discovery and device fingerprinting.
+
+IN PROGRESS: Milestone 3 - BLE detection depth.
+## Milestone 3 - BLE detection depth
+
+Implemented and physically validated on iPhone:
+- repeated BLE advertisement collection
+- RSSI median/average/strongest sampling with invalid-sample filtering
+- approximate proximity bands
+- advertised name, local name, service UUID, service-data UUID and
+  manufacturer/company metadata capture where iOS exposes it
+- local camera/security fingerprint matching
+- known ordinary/smart-home device recognition to reduce false positives
+- anonymous/strong BLE signals do not become camera warnings by themselves
+- evidence codes and sanitized backend storage
+- exportable findings
+- animated consumer-facing scan/result UX
+- Bluetooth-only evidence cannot establish a hidden-camera threat

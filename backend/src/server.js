@@ -51,11 +51,92 @@ function hashIdentifier(value) {
 }
 
 function sanitizeBle(devices = []) {
-  return devices.map(device => ({
-    ...device,
-    id: undefined,
-    identifierHash: hashIdentifier(device.id),
-  }));
+  return devices.map(device => {
+    const assessment =
+      device.assessment && typeof device.assessment === 'object'
+        ? {
+            category: String(device.assessment.category || 'unknown'),
+            evidenceLevel: String(
+              device.assessment.evidenceLevel || 'none',
+            ),
+            userTitle: String(device.assessment.userTitle || ''),
+            userSummary: String(device.assessment.userSummary || ''),
+            matchedVendor: device.assessment.matchedVendor
+              ? String(device.assessment.matchedVendor)
+              : null,
+            backendReview: Boolean(device.assessment.backendReview),
+            bluetoothOnlyThreatEligible: false,
+            evidenceCodes: Array.isArray(device.assessment.evidenceCodes)
+              ? device.assessment.evidenceCodes
+                  .map(String)
+                  .slice(0, 20)
+              : [],
+          }
+        : null;
+
+    const displayName =
+      device.name || device.localName
+        ? String(device.name || device.localName).slice(0, 120)
+        : null;
+
+    return {
+      identifierHash: hashIdentifier(device.id),
+      nameHash: hashIdentifier(displayName),
+      advertisedName: assessment?.backendReview
+        ? displayName
+        : null,
+      rssi: Number.isFinite(Number(device.rssi))
+        ? Number(device.rssi)
+        : null,
+      averageRssi: Number.isFinite(Number(device.averageRssi))
+        ? Number(device.averageRssi)
+        : null,
+      strongestRssi: Number.isFinite(Number(device.strongestRssi))
+        ? Number(device.strongestRssi)
+        : null,
+      sightings: Number.isFinite(Number(device.sightings))
+        ? Math.max(0, Number(device.sightings))
+        : 0,
+      proximity: [
+        'very_close',
+        'nearby',
+        'farther',
+        'unknown',
+      ].includes(device.proximity)
+        ? device.proximity
+        : 'unknown',
+      serviceUUIDs: Array.isArray(device.serviceUUIDs)
+        ? device.serviceUUIDs.map(String).slice(0, 40)
+        : [],
+      serviceDataUUIDs: Array.isArray(device.serviceDataUUIDs)
+        ? device.serviceDataUUIDs.map(String).slice(0, 40)
+        : [],
+      manufacturerCompanyId: device.manufacturerCompanyId
+        ? String(device.manufacturerCompanyId)
+        : null,
+      manufacturerLabel: device.manufacturerLabel
+        ? String(device.manufacturerLabel)
+        : null,
+      manufacturerDataHash: hashIdentifier(
+        device.manufacturerData,
+      ),
+      txPowerLevel: Number.isFinite(Number(device.txPowerLevel))
+        ? Number(device.txPowerLevel)
+        : null,
+      isConnectable:
+        typeof device.isConnectable === 'boolean'
+          ? device.isConnectable
+          : null,
+      serviceSignature: device.serviceSignature
+        ? String(device.serviceSignature).slice(0, 1000)
+        : null,
+      assessment,
+      suspicionScore: Number(device.suspicionScore || 0),
+      reasons: Array.isArray(device.reasons)
+        ? device.reasons.map(String).slice(0, 20)
+        : [],
+    };
+  });
 }
 
 function sanitizeNetwork(devices = []) {

@@ -134,16 +134,29 @@ export function calculateRisk(input = {}) {
     }
   }
 
-  // Generic BLE proximity does not imply camera evidence. Only a camera/security
-  // fingerprint contributes BLE risk.
+  // BLE proximity alone is not camera evidence. Only structured
+  // camera/security fingerprints contribute to the property risk.
   for (const device of bleDevices) {
-    const name = String(device.name || '').toLowerCase();
-    const cameraName = CAMERA_NAME_HINTS.some(hint => name.includes(hint));
+    const assessment =
+      device && typeof device.assessment === 'object'
+        ? device.assessment
+        : null;
 
-    if (cameraName) {
-      score += 16;
+    if (!assessment?.backendReview) {
+      continue;
+    }
+
+    const contribution =
+      assessment.evidenceLevel === 'strong'
+        ? 20
+        : assessment.evidenceLevel === 'moderate'
+          ? 14
+          : 0;
+
+    if (contribution > 0) {
+      score += contribution;
       reasons.push(
-        `Nearby Bluetooth device name resembles camera/security hardware: ${device.name}`,
+        `${assessment.userTitle || 'Camera/security Bluetooth device'} detected over Bluetooth.`,
       );
     }
   }

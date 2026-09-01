@@ -13,3 +13,6 @@ backend/uploads/*
 .milestone2c1-native-backup-*/
 .milestone2c2-ui-backup-*/
 .milestone2c3-evidence-ui-backup-*/
+.milestone3-ble-backup-*/
+.milestone3a-ux-backup-*/
+.milestone3-final-backup-*/

@@ -134,17 +134,29 @@ export function calculateRisk(session: SweepSession): RiskResult {
     }
   }
 
-  // RSSI alone is proximity evidence, not camera evidence. Keep unnamed/unknown
-  // BLE devices visible in the BLE results, but do not let generic nearby BLE
-  // advertisements create a high hidden-camera concern score.
+  // BLE proximity alone is not camera evidence. Only structured
+  // camera/security fingerprints contribute to the sweep risk.
   for (const device of session.bleDevices) {
-    const name = (device.name || '').toLowerCase();
-    const namedLikeCamera = cameraNameHints.some(hint => name.includes(hint));
+    const assessment = device.assessment;
 
-    if (namedLikeCamera) {
-      score += 16;
+    if (!assessment?.backendReview) {
+      continue;
+    }
+
+    const contribution =
+      assessment.evidenceLevel === 'strong'
+        ? 20
+        : assessment.evidenceLevel === 'moderate'
+          ? 14
+          : 0;
+
+    if (contribution > 0) {
+      score += contribution;
       reasons.push(
-        `Nearby Bluetooth device name resembles camera/security hardware: ${device.name}`,
+        `${assessment.userTitle} detected over Bluetooth (${device.proximity.replace(
+          '_',
+          ' ',
+        )} proximity estimate).`,
       );
     }
   }

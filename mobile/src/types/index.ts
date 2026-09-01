@@ -70,12 +70,45 @@ export type NetworkDevice = {
   reasons: string[];
 };
 
+export type BleProximity =
+  | 'very_close'
+  | 'nearby'
+  | 'farther'
+  | 'unknown';
+
+export type BleAssessment = {
+  category:
+    | 'camera_security'
+    | 'security_ecosystem'
+    | 'other'
+    | 'unknown';
+  evidenceLevel: 'none' | 'weak' | 'moderate' | 'strong';
+  userTitle: string;
+  userSummary: string;
+  matchedVendor?: string;
+  backendReview: boolean;
+  bluetoothOnlyThreatEligible: boolean;
+  evidenceCodes: string[];
+};
+
 export type BleDeviceFinding = {
   id: string;
   name: string | null;
+  localName?: string | null;
   rssi: number | null;
+  averageRssi: number | null;
+  strongestRssi: number | null;
+  sightings: number;
+  proximity: BleProximity;
   serviceUUIDs: string[];
+  serviceDataUUIDs: string[];
   manufacturerData?: string | null;
+  manufacturerCompanyId?: string | null;
+  manufacturerLabel?: string | null;
+  txPowerLevel?: number | null;
+  isConnectable?: boolean | null;
+  serviceSignature?: string | null;
+  assessment: BleAssessment;
   suspicionScore: number;
   reasons: string[];
 };
