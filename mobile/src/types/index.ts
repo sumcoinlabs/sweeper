@@ -25,12 +25,20 @@ export type BonjourServiceFinding = {
   port?: number;
 };
 
+export type SsdpServiceFinding = {
+  st?: string;
+  usn?: string;
+  location?: string;
+  server?: string;
+};
+
 export type NetworkDevice = {
   ip: string;
   hostname?: string;
   openPorts: number[];
   bonjourServices?: BonjourServiceFinding[];
-  discoverySources?: Array<'tcp' | 'mdns'>;
+  ssdpServices?: SsdpServiceFinding[];
+  discoverySources?: Array<'tcp' | 'mdns' | 'ssdp'>;
   suspicionScore: number;
   reasons: string[];
 };

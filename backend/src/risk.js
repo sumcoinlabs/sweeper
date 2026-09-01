@@ -11,6 +11,26 @@ const CAMERA_MDNS_TYPES = new Set([
   '_vapix-http._tcp',
   '_vapix-https._tcp',
 ]);
+const SSDP_CAMERA_HINTS = [
+  'camera',
+  'ip camera',
+  'ipcam',
+  'network camera',
+  'nvr',
+  'dvr',
+  'onvif',
+  'axis',
+  'hikvision',
+  'dahua',
+  'reolink',
+  'amcrest',
+  'foscam',
+  'eufy',
+  'wyze',
+  'arlo',
+  'ring',
+  'ezviz',
+];
 const EMBEDDED_PORTS = new Set([8000, 8080, 8899]);
 
 export function calculateRisk(input = {}) {
@@ -59,6 +79,27 @@ export function calculateRisk(input = {}) {
         `LAN host ${device.hostname || device.ip || 'unknown'} advertises camera/video Bonjour service(s): ${[
           ...new Set(mdnsCameraServices.map(service => service.type)),
         ].join(', ')}`,
+      );
+    }
+
+    const ssdpText = Array.isArray(device.ssdpServices)
+      ? device.ssdpServices
+          .map(service =>
+            [
+              service?.st || '',
+              service?.usn || '',
+              service?.server || '',
+              service?.location || '',
+            ].join(' '),
+          )
+          .join(' ')
+          .toLowerCase()
+      : '';
+
+    if (SSDP_CAMERA_HINTS.some(hint => ssdpText.includes(hint))) {
+      score += 24;
+      reasons.push(
+        `LAN host ${device.hostname || device.ip || 'unknown'} advertises an SSDP/UPnP camera or security-device fingerprint.`,
       );
     }
   }

@@ -8,6 +8,26 @@ const cameraMdnsTypes = new Set([
   '_vapix-http._tcp',
   '_vapix-https._tcp',
 ]);
+const ssdpCameraHints = [
+  'camera',
+  'ip camera',
+  'ipcam',
+  'network camera',
+  'nvr',
+  'dvr',
+  'onvif',
+  'axis',
+  'hikvision',
+  'dahua',
+  'reolink',
+  'amcrest',
+  'foscam',
+  'eufy',
+  'wyze',
+  'arlo',
+  'ring',
+  'ezviz',
+];
 const embeddedPorts = new Set([8000, 8080, 8899]);
 const cameraNameHints = [
   'camera',
@@ -64,6 +84,25 @@ export function calculateRisk(session: SweepSession): RiskResult {
         `${device.hostname || device.ip} advertises camera/video Bonjour service(s): ${[
           ...new Set(mdnsCameraServices.map(service => service.type)),
         ].join(', ')}`,
+      );
+    }
+
+    const ssdpText = (device.ssdpServices || [])
+      .map(service =>
+        [
+          service.st || '',
+          service.usn || '',
+          service.server || '',
+          service.location || '',
+        ].join(' '),
+      )
+      .join(' ')
+      .toLowerCase();
+
+    if (ssdpCameraHints.some(hint => ssdpText.includes(hint))) {
+      score += 24;
+      reasons.push(
+        `${device.hostname || device.ip} advertises an SSDP/UPnP camera or security-device fingerprint.`,
       );
     }
   }

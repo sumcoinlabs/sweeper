@@ -8,3 +8,4 @@ backend/uploads/*
 .sweeper-*-backup*/
 .milestone1-hardware-fix-*/
 .milestone*-hardware-fix-*/
+.milestone2b-ssdp-backup-*/

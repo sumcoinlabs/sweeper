@@ -75,9 +75,17 @@ function sanitizeNetwork(devices = []) {
             : null,
         }))
       : [],
+    ssdpServices: Array.isArray(device.ssdpServices)
+      ? device.ssdpServices.map(service => ({
+          st: service.st ? String(service.st) : null,
+          usn: service.usn ? String(service.usn) : null,
+          location: service.location ? String(service.location) : null,
+          server: service.server ? String(service.server) : null,
+        }))
+      : [],
     discoverySources: Array.isArray(device.discoverySources)
       ? device.discoverySources.filter(source =>
-          ['tcp', 'mdns'].includes(source),
+          ['tcp', 'mdns', 'ssdp'].includes(source),
         )
       : [],
     reasons: Array.isArray(device.reasons) ? device.reasons.map(String) : [],
