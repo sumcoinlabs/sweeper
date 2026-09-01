@@ -9,3 +9,7 @@ backend/uploads/*
 .milestone1-hardware-fix-*/
 .milestone*-hardware-fix-*/
 .milestone2b-ssdp-backup-*/
+.milestone2c-network-backup-*/
+.milestone2c1-native-backup-*/
+.milestone2c2-ui-backup-*/
+.milestone2c3-evidence-ui-backup-*/

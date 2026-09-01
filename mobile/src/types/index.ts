@@ -32,13 +32,40 @@ export type SsdpServiceFinding = {
   server?: string;
 };
 
+export type NetworkFingerprint = {
+  protocol: 'http' | 'rtsp';
+  port: number;
+  summary: string;
+  cameraHint?: boolean;
+  confirmed?: boolean;
+};
+
+export type NetworkAssessment = {
+  category:
+    | 'network_video'
+    | 'camera_security'
+    | 'media'
+    | 'other'
+    | 'unknown';
+  evidenceLevel: 'none' | 'weak' | 'moderate' | 'strong';
+  userTitle: string;
+  userSummary: string;
+  backendReview: boolean;
+  networkOnlyThreatEligible: boolean;
+  evidenceCodes: string[];
+};
+
 export type NetworkDevice = {
   ip: string;
   hostname?: string;
+  icmpResponsive?: boolean;
+  icmpRttMs?: number;
   openPorts: number[];
   bonjourServices?: BonjourServiceFinding[];
   ssdpServices?: SsdpServiceFinding[];
-  discoverySources?: Array<'tcp' | 'mdns' | 'ssdp'>;
+  fingerprints?: NetworkFingerprint[];
+  assessment?: NetworkAssessment;
+  discoverySources?: Array<'icmp' | 'tcp' | 'mdns' | 'ssdp'>;
   suspicionScore: number;
   reasons: string[];
 };

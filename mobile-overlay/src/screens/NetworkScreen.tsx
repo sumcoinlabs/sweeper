@@ -1,5 +1,12 @@
 import React, {useMemo, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {
   Body,
   Card,
@@ -11,20 +18,113 @@ import {
   palette,
 } from '../components/ui';
 import {scanLocalNetwork} from '../services/networkScanner';
-import type {NetworkDevice} from '../types';
+import type {NetworkAssessment, NetworkDevice} from '../types';
 
-function displayName(device: NetworkDevice): string {
-  const bonjourName = device.bonjourServices?.find(
-    service => service.name && !service.name.startsWith('_'),
-  )?.name;
+function isIpv4(value: string): boolean {
+  return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(value);
+}
 
-  if (bonjourName) return bonjourName;
-  if (device.hostname) return device.hostname;
+function assessmentFor(
+  device: NetworkDevice,
+): NetworkAssessment {
+  if (device.assessment) return device.assessment;
 
-  const server = device.ssdpServices?.find(service => service.server)?.server;
-  if (server) return server;
+  const confirmedRtsp = device.fingerprints?.some(
+    fingerprint =>
+      fingerprint.protocol === 'rtsp' &&
+      fingerprint.confirmed,
+  );
 
-  return device.ip;
+  if (confirmedRtsp) {
+    return {
+      category: 'network_video',
+      evidenceLevel: 'strong',
+      userTitle: 'Possible IP camera or video recorder',
+      userSummary:
+        'This device responded to a standard network video-streaming protocol. That is strong evidence of network video equipment, but Wi-Fi alone cannot tell whether it is hidden or improperly placed.',
+      backendReview: true,
+      networkOnlyThreatEligible: false,
+      evidenceCodes: ['RTSP_CONFIRMED'],
+    };
+  }
+
+  return {
+    category: 'other',
+    evidenceLevel: 'none',
+    userTitle: 'Other network device',
+    userSummary:
+      'Sweeper found this device but did not find camera-specific evidence.',
+    backendReview: false,
+    networkOnlyThreatEligible: false,
+    evidenceCodes: [],
+  };
+}
+
+function confidenceLabel(
+  assessment: NetworkAssessment,
+): string {
+  switch (assessment.evidenceLevel) {
+    case 'strong':
+      return 'Strong camera/video signal';
+    case 'moderate':
+      return 'Camera-related signal';
+    case 'weak':
+      return 'Weak signal';
+    default:
+      return 'No camera-specific signal';
+  }
+}
+
+function buildExport(
+  devices: NetworkDevice[],
+): string {
+  const ipv4Devices = devices.filter(device => isIpv4(device.ip));
+  const cautions = devices.filter(
+    device => assessmentFor(device).backendReview,
+  );
+
+  const lines = [
+    'SWEEPER WI-FI FINDINGS',
+    `Generated: ${new Date().toISOString()}`,
+    '',
+    `Network devices checked: ${ipv4Devices.length || devices.length}`,
+    `Camera/video signals: ${cautions.length}`,
+    '',
+    'IMPORTANT',
+    'A network camera/video signal does not prove a hidden camera or an improper recording device. Physical context and additional evidence are required before reporting a property as a threat.',
+  ];
+
+  cautions.forEach((device, index) => {
+    const assessment = assessmentFor(device);
+
+    lines.push(
+      '',
+      `FINDING ${index + 1}`,
+      assessment.userTitle,
+      `Evidence strength: ${confidenceLabel(assessment)}`,
+      assessment.userSummary,
+      `Evidence codes: ${
+        assessment.evidenceCodes.join(', ') || 'none'
+      }`,
+      '',
+      'Technical evidence for support/backend review:',
+      `Address: ${device.ip}`,
+      `Open tested ports: ${
+        device.openPorts.join(', ') || 'none'
+      }`,
+      `Detected by: ${
+        device.discoverySources?.join(', ') || 'unknown'
+      }`,
+    );
+
+    device.fingerprints?.forEach(fingerprint => {
+      lines.push(
+        `${fingerprint.protocol.toUpperCase()} ${fingerprint.port}: ${fingerprint.summary}`,
+      );
+    });
+  });
+
+  return lines.join('\n');
 }
 
 export function NetworkScreen({
@@ -42,53 +142,48 @@ export function NetworkScreen({
   const [error, setError] = useState('');
   const [attempted, setAttempted] = useState(initial.length > 0);
 
-  const counts = useMemo(() => {
-    const mdns = devices.filter(device =>
-      device.discoverySources?.includes('mdns'),
-    ).length;
-    const ssdp = devices.filter(device =>
-      device.discoverySources?.includes('ssdp'),
-    ).length;
-    const tcp = devices.filter(device =>
-      device.discoverySources?.includes('tcp'),
-    ).length;
-    const review = devices.filter(
-      device => device.suspicionScore >= 20,
-    ).length;
+  const cautions = useMemo(
+    () =>
+      devices.filter(
+        device => assessmentFor(device).backendReview,
+      ),
+    [devices],
+  );
 
-    return {mdns, ssdp, tcp, review};
+  const checkedCount = useMemo(() => {
+    const ipv4 = devices.filter(device => isIpv4(device.ip)).length;
+    return ipv4 || devices.length;
   }, [devices]);
 
   const scan = async () => {
     setLoading(true);
     setAttempted(true);
     setError('');
-    setProgress('Starting TCP + Bonjour + SSDP discovery…');
+    setProgress('Checking this Wi-Fi…');
 
     try {
       const results = await scanLocalNetwork(p => {
-        if (p.phase === 'mdns') {
-          setProgress(
-            `Bonjour ${p.completed}/${p.total} service types · ${p.foundServices} service(s)`,
-          );
-        } else if (p.phase === 'ssdp') {
-          setProgress(
-            p.completed
-              ? `SSDP complete · ${p.foundServices} response(s)`
-              : 'Searching for UPnP/SSDP devices…',
-          );
-        } else {
-          setProgress(
-            `TCP ${Math.round((p.completed / p.total) * 100)}% · ${p.foundHosts} discovered host(s)`,
-          );
+        if (p.phase === 'icmp') {
+          setProgress('Finding devices on this Wi-Fi…');
+        } else if (p.phase === 'tcp') {
+          setProgress('Checking for camera/video signals…');
+        } else if (p.phase === 'fingerprint') {
+          setProgress('Identifying possible camera equipment…');
         }
       });
 
       setDevices(results);
+
+      const reviewCount = results.filter(
+        device => assessmentFor(device).backendReview,
+      ).length;
+
       setProgress(
-        `Complete · ${results.length} device(s) · ${results.filter(
-          item => item.suspicionScore >= 20,
-        ).length} to review`,
+        reviewCount > 0
+          ? `Complete · ${reviewCount} camera/video signal${
+              reviewCount === 1 ? '' : 's'
+            } found`
+          : 'Complete · no camera-specific Wi-Fi signals found',
       );
     } catch (e) {
       setDevices([]);
@@ -99,148 +194,153 @@ export function NetworkScreen({
     }
   };
 
+  const exportFindings = async () => {
+    try {
+      await Share.share({
+        title: 'Sweeper Wi-Fi findings',
+        message: buildExport(devices),
+      });
+    } catch (e) {
+      Alert.alert(
+        'Could not export findings',
+        e instanceof Error ? e.message : String(e),
+      );
+    }
+  };
+
   return (
     <Screen>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <Title>Wi-Fi sweep</Title>
+        <Title>Wi-Fi check</Title>
         <Body>
-          Sweeper combines safe TCP service checks, Bonjour/mDNS and
-          SSDP/UPnP discovery. It does not log in to devices, retrieve content,
-          or treat a generic network device as proof of a camera.
+          Sweeper looks for network behavior commonly associated with
+          cameras and video-security equipment.
         </Body>
 
         <PrimaryButton
-          title={attempted ? 'SCAN AGAIN' : 'START WI-FI SCAN'}
+          title={attempted ? 'CHECK AGAIN' : 'CHECK WI-FI'}
           onPress={scan}
           loading={loading}
         />
 
-        {progress ? <Text style={styles.progress}>{progress}</Text> : null}
-
-        {attempted && !loading && !error ? (
-          <Card>
-            <View style={styles.metricRow}>
-              <Text style={styles.metric}>Devices discovered</Text>
-              <Text style={styles.value}>{devices.length}</Text>
-            </View>
-            <View style={styles.metricRow}>
-              <Text style={styles.metric}>Bonjour/mDNS devices</Text>
-              <Text style={styles.value}>{counts.mdns}</Text>
-            </View>
-            <View style={styles.metricRow}>
-              <Text style={styles.metric}>SSDP/UPnP devices</Text>
-              <Text style={styles.value}>{counts.ssdp}</Text>
-            </View>
-            <View style={styles.metricRow}>
-              <Text style={styles.metric}>TCP-responsive devices</Text>
-              <Text style={styles.value}>{counts.tcp}</Text>
-            </View>
-            <View style={styles.metricRow}>
-              <Text style={styles.metric}>Devices to review</Text>
-              <Text style={styles.value}>{counts.review}</Text>
-            </View>
-          </Card>
+        {progress ? (
+          <Text style={styles.progress}>{progress}</Text>
         ) : null}
 
         {error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorTitle}>Wi-Fi scan unavailable</Text>
-            <Text style={styles.error}>{error}</Text>
+            <Subtitle>Wi-Fi check unavailable</Subtitle>
+            <Body>{error}</Body>
           </Card>
         ) : null}
 
-        {devices.map((device, index) => {
-          const name = displayName(device);
-          const showIp = name !== device.ip;
+        {attempted && !loading && !error ? (
+          <>
+            <Card
+              style={
+                cautions.length > 0
+                  ? styles.cautionSummary
+                  : styles.clearSummary
+              }>
+              <Text
+                style={
+                  cautions.length > 0
+                    ? styles.cautionHeading
+                    : styles.clearHeading
+                }>
+                {cautions.length > 0
+                  ? `${cautions.length} camera/video signal${
+                      cautions.length === 1 ? '' : 's'
+                    } found`
+                  : 'No camera-specific Wi-Fi signals found'}
+              </Text>
 
-          return (
-            <Card key={`${device.ip}-${device.hostname || ''}-${index}`}>
-              <View style={styles.row}>
-                <View style={styles.titleArea}>
-                  <Subtitle>{name}</Subtitle>
-                  {showIp ? (
-                    <Text style={styles.address}>{device.ip}</Text>
-                  ) : null}
-                </View>
-                <Text
-                  style={
-                    device.suspicionScore >= 20 ? styles.flag : styles.ok
-                  }>
-                  {device.suspicionScore >= 20 ? 'REVIEW' : 'FOUND'}
-                </Text>
-              </View>
+              <Body>
+                Sweeper checked {checkedCount} network device
+                {checkedCount === 1 ? '' : 's'}.
+              </Body>
 
-              {device.discoverySources?.length ? (
-                <Text style={styles.source}>
-                  Found by: {device.discoverySources.join(' + ').toUpperCase()}
-                </Text>
-              ) : null}
-
-              {device.openPorts.length ? (
-                <Body>Open tested ports: {device.openPorts.join(', ')}</Body>
-              ) : null}
-
-              {device.bonjourServices?.length ? (
-                <View style={styles.services}>
-                  {device.bonjourServices.map((service, serviceIndex) => (
-                    <Text
-                      key={`${service.type}-${service.name}-${serviceIndex}`}
-                      style={styles.service}>
-                      {service.type}
-                      {service.name ? ` · ${service.name}` : ''}
-                      {service.port ? ` · port ${service.port}` : ''}
-                    </Text>
-                  ))}
-                </View>
-              ) : null}
-
-              {device.ssdpServices?.length ? (
-                <View style={styles.services}>
-                  {device.ssdpServices.map((service, serviceIndex) => (
-                    <View
-                      key={`${service.usn || ''}-${service.st || ''}-${serviceIndex}`}
-                      style={styles.ssdpBlock}>
-                      <Text style={styles.service}>
-                        SSDP
-                        {service.st ? ` · ${service.st}` : ''}
-                      </Text>
-                      {service.server ? (
-                        <Text style={styles.detail}>
-                          Server: {service.server}
-                        </Text>
-                      ) : null}
-                      {service.location ? (
-                        <Text style={styles.detail} numberOfLines={2}>
-                          Description: {service.location}
-                        </Text>
-                      ) : null}
-                    </View>
-                  ))}
-                </View>
-              ) : null}
-
-              {device.reasons.map((reason, reasonIndex) => (
-                <Text
-                  key={`${reasonIndex}-${reason}`}
-                  style={styles.reason}>
-                  • {reason}
-                </Text>
-              ))}
+              <Text style={styles.notVerdict}>
+                {cautions.length > 0
+                  ? 'This is a caution, not a hidden-camera finding.'
+                  : 'Wi-Fi cannot detect every kind of camera. Continue the sweep.'}
+              </Text>
             </Card>
-          );
-        })}
 
-        {attempted && !loading && !error && devices.length === 0 ? (
-          <Card>
-            <Subtitle>No devices discovered</Subtitle>
-            <Body>
-              This network did not expose one of the TCP, Bonjour or SSDP
-              signals Sweeper currently checks. ONVIF/WS-Discovery is the next
-              camera-specific discovery layer.
-            </Body>
-          </Card>
+            {cautions.map((device, index) => {
+              const assessment = assessmentFor(device);
+
+              return (
+                <Card
+                  key={`caution-${device.ip}-${index}`}
+                  style={styles.cautionCard}>
+                  <Text style={styles.cautionLabel}>
+                    CAMERA/VIDEO SIGNAL
+                  </Text>
+
+                  <Subtitle>{assessment.userTitle}</Subtitle>
+
+                  <Text style={styles.confidence}>
+                    {confidenceLabel(assessment)}
+                  </Text>
+
+                  <Body>{assessment.userSummary}</Body>
+
+                  <View style={styles.simpleExplanation}>
+                    <Text style={styles.simpleTitle}>
+                      What this could be
+                    </Text>
+                    <Body>
+                      An IP security camera, doorbell camera, baby monitor,
+                      network video recorder, or another device that streams
+                      video over the local network.
+                    </Body>
+                  </View>
+
+                  <View style={styles.simpleExplanation}>
+                    <Text style={styles.simpleTitle}>
+                      What Sweeper cannot tell yet
+                    </Text>
+                    <Body>
+                      Wi-Fi cannot tell where the device is located, whether it
+                      is hidden, or whether its presence is improper.
+                    </Body>
+                  </View>
+
+                  <View style={styles.actionBox}>
+                    <Text style={styles.actionTitle}>Next step</Text>
+                    <Body>
+                      Continue the Bluetooth, lens and physical checks. If you
+                      find a suspicious object, document it with a photo before
+                      considering a report.
+                    </Body>
+                  </View>
+                </Card>
+              );
+            })}
+
+            <Card style={styles.reportRule}>
+              <Text style={styles.reportRuleTitle}>
+                Do not report a property from Wi-Fi alone
+              </Text>
+              <Body>
+                Sweeper should only treat something as a possible hidden-camera
+                report when multiple pieces of evidence support it, such as a
+                strong camera/video signal plus a suspicious physical finding
+                or photo. Network evidence by itself is saved for analysis but
+                is not enough to accuse a property.
+              </Body>
+            </Card>
+
+            {devices.length > 0 ? (
+              <SecondaryButton
+                title="EXPORT FINDINGS"
+                onPress={exportFindings}
+              />
+            ) : null}
+          </>
         ) : null}
 
         <PrimaryButton
@@ -255,65 +355,85 @@ export function NetworkScreen({
 }
 
 const styles = StyleSheet.create({
-  content: {paddingTop: 10, paddingBottom: 12},
+  content: {
+    paddingTop: 10,
+    paddingBottom: 12,
+  },
   progress: {
     color: palette.accent,
-    fontWeight: '700',
+    fontWeight: '800',
     marginVertical: 12,
   },
-  errorCard: {borderColor: '#5b2a31'},
-  errorTitle: {
-    color: palette.danger,
-    fontWeight: '800',
-    marginBottom: 5,
+  errorCard: {
+    borderColor: '#5b2a31',
   },
-  error: {color: '#f1a0a0', lineHeight: 20},
-  metricRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    paddingVertical: 6,
+  cautionSummary: {
+    borderColor: palette.warning,
   },
-  metric: {color: palette.muted, flex: 1},
-  value: {color: palette.text, fontWeight: '900'},
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 12,
+  clearSummary: {
+    borderColor: palette.accent,
   },
-  titleArea: {flex: 1},
-  flag: {color: palette.warning, fontWeight: '900', fontSize: 12},
-  ok: {color: palette.accent, fontWeight: '900', fontSize: 12},
-  address: {
-    color: palette.muted,
-    fontSize: 12,
-    marginTop: 3,
+  cautionHeading: {
+    color: palette.warning,
+    fontSize: 23,
+    fontWeight: '900',
+    marginBottom: 8,
   },
-  source: {
+  clearHeading: {
     color: palette.accent,
-    fontSize: 11,
-    fontWeight: '800',
-    marginTop: 6,
-    marginBottom: 4,
+    fontSize: 23,
+    fontWeight: '900',
+    marginBottom: 8,
   },
-  services: {marginTop: 7},
-  service: {
+  notVerdict: {
+    color: palette.muted,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 8,
+    fontWeight: '700',
+  },
+  cautionCard: {
+    borderColor: palette.warning,
+  },
+  cautionLabel: {
+    color: palette.warning,
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1.1,
+    marginBottom: 7,
+  },
+  confidence: {
+    color: palette.warning,
+    fontSize: 15,
+    fontWeight: '800',
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  simpleExplanation: {
+    marginTop: 12,
+  },
+  simpleTitle: {
     color: palette.text,
-    fontSize: 13,
-    lineHeight: 19,
+    fontWeight: '900',
+    marginBottom: 2,
+  },
+  actionBox: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.border,
+  },
+  actionTitle: {
+    color: palette.accent,
+    fontWeight: '900',
     marginBottom: 3,
   },
-  ssdpBlock: {marginBottom: 7},
-  detail: {
-    color: palette.muted,
-    fontSize: 12,
-    lineHeight: 17,
+  reportRule: {
+    borderColor: palette.border,
   },
-  reason: {
+  reportRuleTitle: {
     color: palette.text,
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 5,
+    fontWeight: '900',
+    marginBottom: 5,
   },
 });

@@ -62,6 +62,10 @@ function sanitizeNetwork(devices = []) {
   return devices.map(device => ({
     ip: String(device.ip || ''),
     hostname: device.hostname ? String(device.hostname) : null,
+    icmpResponsive: Boolean(device.icmpResponsive),
+    icmpRttMs: Number.isFinite(Number(device.icmpRttMs))
+      ? Number(device.icmpRttMs)
+      : null,
     openPorts: Array.isArray(device.openPorts)
       ? device.openPorts.map(Number).filter(Number.isFinite)
       : [],
@@ -83,12 +87,42 @@ function sanitizeNetwork(devices = []) {
           server: service.server ? String(service.server) : null,
         }))
       : [],
+    fingerprints: Array.isArray(device.fingerprints)
+      ? device.fingerprints.map(fingerprint => ({
+          protocol:
+            fingerprint.protocol === 'rtsp' ? 'rtsp' : 'http',
+          port: Number(fingerprint.port || 0),
+          summary: String(fingerprint.summary || '').slice(0, 500),
+          cameraHint: Boolean(fingerprint.cameraHint),
+          confirmed: Boolean(fingerprint.confirmed),
+        }))
+      : [],
+    assessment:
+      device.assessment && typeof device.assessment === 'object'
+        ? {
+            category: String(device.assessment.category || 'unknown'),
+            evidenceLevel: String(
+              device.assessment.evidenceLevel || 'none',
+            ),
+            userTitle: String(device.assessment.userTitle || ''),
+            userSummary: String(device.assessment.userSummary || ''),
+            backendReview: Boolean(device.assessment.backendReview),
+            networkOnlyThreatEligible: false,
+            evidenceCodes: Array.isArray(device.assessment.evidenceCodes)
+              ? device.assessment.evidenceCodes
+                  .map(String)
+                  .slice(0, 20)
+              : [],
+          }
+        : null,
     discoverySources: Array.isArray(device.discoverySources)
       ? device.discoverySources.filter(source =>
-          ['tcp', 'mdns', 'ssdp'].includes(source),
+          ['icmp', 'tcp', 'mdns', 'ssdp'].includes(source),
         )
       : [],
-    reasons: Array.isArray(device.reasons) ? device.reasons.map(String) : [],
+    reasons: Array.isArray(device.reasons)
+      ? device.reasons.map(String)
+      : [],
     suspicionScore: Number(device.suspicionScore || 0),
   }));
 }

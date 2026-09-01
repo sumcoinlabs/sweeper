@@ -102,6 +102,36 @@ export function calculateRisk(input = {}) {
         `LAN host ${device.hostname || device.ip || 'unknown'} advertises an SSDP/UPnP camera or security-device fingerprint.`,
       );
     }
+
+    const fingerprints = Array.isArray(device.fingerprints)
+      ? device.fingerprints
+      : [];
+
+    const confirmedRtsp = fingerprints.filter(
+      fingerprint =>
+        fingerprint?.protocol === 'rtsp' &&
+        fingerprint?.confirmed,
+    );
+
+    const cameraHttp = fingerprints.filter(
+      fingerprint =>
+        fingerprint?.protocol === 'http' &&
+        fingerprint?.cameraHint,
+    );
+
+    if (confirmedRtsp.length > 0) {
+      score += 10;
+      reasons.push(
+        `LAN host ${device.hostname || device.ip || 'unknown'} returned a confirmed RTSP protocol response.`,
+      );
+    }
+
+    if (cameraHttp.length > 0) {
+      score += 24;
+      reasons.push(
+        `LAN host ${device.hostname || device.ip || 'unknown'} returned an HTTP camera/security fingerprint.`,
+      );
+    }
   }
 
   // Generic BLE proximity does not imply camera evidence. Only a camera/security

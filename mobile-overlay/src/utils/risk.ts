@@ -105,6 +105,33 @@ export function calculateRisk(session: SweepSession): RiskResult {
         `${device.hostname || device.ip} advertises an SSDP/UPnP camera or security-device fingerprint.`,
       );
     }
+
+    const fingerprints = device.fingerprints || [];
+    const confirmedRtsp = fingerprints.filter(
+      fingerprint =>
+        fingerprint.protocol === 'rtsp' &&
+        fingerprint.confirmed,
+    );
+
+    const cameraHttp = fingerprints.filter(
+      fingerprint =>
+        fingerprint.protocol === 'http' &&
+        fingerprint.cameraHint,
+    );
+
+    if (confirmedRtsp.length > 0) {
+      score += 10;
+      reasons.push(
+        `${device.hostname || device.ip} returned a confirmed RTSP protocol response.`,
+      );
+    }
+
+    if (cameraHttp.length > 0) {
+      score += 24;
+      reasons.push(
+        `${device.hostname || device.ip} returned an HTTP camera/security fingerprint.`,
+      );
+    }
   }
 
   // RSSI alone is proximity evidence, not camera evidence. Keep unnamed/unknown
