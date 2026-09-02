@@ -147,10 +147,9 @@ export function ChecklistScreen({
         <Card style={styles.cameraCard}>
           <Subtitle>See something questionable?</Subtitle>
           <Body>
-            Open Lens Assist to inspect it with the camera and optionally save an
-            evidence photo.
+            Open the Camera Scanner to inspect it for a lens-like reflection or infrared light and optionally save an evidence photo.
           </Body>
-          <SecondaryButton title="OPEN LENS ASSIST" onPress={onOpenCamera} />
+          <SecondaryButton title="OPEN CAMERA SCANNER" onPress={onOpenCamera} />
         </Card>
 
         <PrimaryButton

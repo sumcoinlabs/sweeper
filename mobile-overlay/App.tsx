@@ -28,6 +28,7 @@ function emptySession(): SweepSession {
 export default function App() {
   const [step, setStep] = useState<SweepStep>('home');
   const [session, setSession] = useState<SweepSession>(emptySession);
+  const [cameraReturnStep, setCameraReturnStep] = useState<SweepStep>('checklist');
 
   const restart = () => {
     setSession(emptySession());
@@ -37,7 +38,15 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="light-content" />
-      {step === 'home' && <HomeScreen onStart={() => setStep('location')} />}
+      {step === 'home' && (
+        <HomeScreen
+          onStart={() => setStep('location')}
+          onCameraScan={() => {
+            setCameraReturnStep('home');
+            setStep('camera');
+          }}
+        />
+      )}
       {step === 'location' && (
         <LocationScreen
           initial={session.location}
@@ -72,7 +81,10 @@ export default function App() {
         <ChecklistScreen
           items={session.checklist}
           onChange={checklist => setSession(current => ({...current, checklist}))}
-          onOpenCamera={() => setStep('camera')}
+          onOpenCamera={() => {
+            setCameraReturnStep('checklist');
+            setStep('camera');
+          }}
           onContinue={() => setStep('summary')}
           onBack={() => setStep('bluetooth')}
         />
@@ -80,7 +92,7 @@ export default function App() {
       {step === 'camera' && (
         <CameraAssistScreen
           onPhoto={photo => setSession(current => ({...current, photos: [...current.photos, photo]}))}
-          onDone={() => setStep('checklist')}
+          onDone={() => setStep(cameraReturnStep)}
         />
       )}
       {step === 'summary' && (

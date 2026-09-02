@@ -1,5 +1,5 @@
 import {PermissionsAndroid, Platform} from 'react-native';
-import {BleManager, type Device, type State} from 'react-native-ble-plx';
+import {BleManager, type Device, type State} from '@sfourdrinier/react-native-ble-plx';
 import {BLE_SCAN_DURATION_MS} from '../config';
 import type {
   BleAssessment,
@@ -50,7 +50,7 @@ async function requestPermissions(): Promise<boolean> {
   return result === PermissionsAndroid.RESULTS.GRANTED;
 }
 
-function stateError(state: State): Error | null {
+function stateError(state: keyof typeof State): Error | null {
   switch (state) {
     case 'Unsupported':
       return new Error(

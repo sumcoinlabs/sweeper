@@ -177,3 +177,15 @@ Implemented and physically validated on iPhone:
 - exportable findings
 - animated consumer-facing scan/result UX
 - Bluetooth-only evidence cannot establish a hidden-camera threat
+
+
+<!-- SWEEPER_M4_COMPLETE -->
+## Milestone 4 — Lens / IR Assist
+
+**Implemented and physically validated.**
+
+The phone-only optical layer now detects lens-like bright-point returns and possible IR sources using on-device frame analysis. Results are explicitly treated as clues rather than proof of a hidden camera. No cloud CV service is used.
+
+See `MILESTONE_4_VALIDATION.md`.
+
+The next implementation target is **Milestone 5: automatic GPS-only property identification with no manual property/address input.**

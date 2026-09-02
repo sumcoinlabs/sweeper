@@ -1,8 +1,23 @@
 import React from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Body, Card, PrimaryButton, Screen, Subtitle, Title, palette} from '../components/ui';
+import {
+  Body,
+  Card,
+  PrimaryButton,
+  Screen,
+  SecondaryButton,
+  Subtitle,
+  Title,
+  palette,
+} from '../components/ui';
 
-export function HomeScreen({onStart}: {onStart: () => void}) {
+export function HomeScreen({
+  onStart,
+  onCameraScan,
+}: {
+  onStart: () => void;
+  onCameraScan: () => void;
+}) {
   return (
     <Screen>
       <ScrollView
@@ -12,39 +27,72 @@ export function HomeScreen({onStart}: {onStart: () => void}) {
           <Text style={styles.brand}>SWEEPER</Text>
           <Title>Check a room for signs of hidden surveillance.</Title>
           <Body>
-            Sweep the local network, look for nearby Bluetooth devices, inspect common hiding spots, and document anything suspicious.
+            Use the camera scanner immediately, or run the full room sweep for
+            Wi-Fi, Bluetooth, physical and optical evidence together.
           </Body>
         </View>
 
-        <Card>
-          <Subtitle>What Sweeper checks</Subtitle>
-          <Text style={styles.item}>• Local-network services commonly used by cameras and embedded devices</Text>
-          <Text style={styles.item}>• Nearby Bluetooth devices and signal strength</Text>
-          <Text style={styles.item}>• Common physical hiding locations</Text>
-          <Text style={styles.item}>• Photos you choose to save as evidence</Text>
-        </Card>
-
-        <Card>
-          <Subtitle>Privacy first</Subtitle>
+        <Card style={styles.cameraCard}>
+          <Text style={styles.quick}>QUICK CAMERA TOOL</Text>
+          <Subtitle>Lens & IR Scanner</Subtitle>
           <Body>
-            Scanning happens on your device. Nothing is uploaded until you choose to submit the sweep.
+            Look for lens-like reflections and infrared night-vision light.
+            No Wi-Fi scan or checklist is required.
           </Body>
+          <PrimaryButton title="OPEN CAMERA SCANNER" onPress={onCameraScan} />
         </Card>
 
-        <View style={styles.action}>
-          <PrimaryButton title="START A SWEEP" onPress={onStart} />
-          <Text style={styles.disclaimer}>A suspicious device is not automatically a hidden camera.</Text>
-        </View>
+        <Card>
+          <Subtitle>Full room sweep</Subtitle>
+          <Body>
+            Combines network, Bluetooth, physical inspection and camera
+            evidence into one assessment.
+          </Body>
+          <SecondaryButton title="START FULL SWEEP" onPress={onStart} />
+        </Card>
+
+        <Text style={styles.disclaimer}>
+          No phone-only detector can guarantee a room is camera-free. Sweeper
+          highlights evidence worth inspecting instead of making automatic
+          accusations.
+        </Text>
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {flexGrow: 1, paddingTop: 10, paddingBottom: 12, gap: 18},
-  hero: {marginBottom: 2},
-  brand: {color: palette.accent, fontWeight: '900', letterSpacing: 4, marginBottom: 12},
-  item: {color: palette.text, fontSize: 15, lineHeight: 25, marginBottom: 3},
-  action: {marginTop: 'auto'},
-  disclaimer: {color: palette.muted, fontSize: 12, lineHeight: 18, textAlign: 'center', marginTop: 10, paddingHorizontal: 14},
+  content: {
+    flexGrow: 1,
+    paddingTop: 10,
+    paddingBottom: 12,
+    gap: 18,
+  },
+  hero: {
+    marginBottom: 2,
+  },
+  brand: {
+    color: palette.accent,
+    fontWeight: '900',
+    letterSpacing: 4,
+    marginBottom: 12,
+  },
+  cameraCard: {
+    borderColor: '#55d6be',
+    backgroundColor: '#101b22',
+  },
+  quick: {
+    color: '#55d6be',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1.3,
+    marginBottom: 6,
+  },
+  disclaimer: {
+    color: palette.muted,
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+    paddingHorizontal: 14,
+  },
 });

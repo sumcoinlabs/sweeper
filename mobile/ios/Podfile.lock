@@ -39,7 +39,6 @@ PODS:
   - hermes-engine (250829098.0.16):
     - hermes-engine/Pre-built (= 250829098.0.16)
   - hermes-engine/Pre-built (250829098.0.16)
-  - MultiplatformBleAdapter (0.2.0)
   - NitroImage (0.15.2):
     - hermes-engine
     - NitroModules
@@ -1343,9 +1342,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-ble-plx (3.5.1):
+  - react-native-ble-plx (3.9.3):
     - hermes-engine
-    - MultiplatformBleAdapter (= 0.2.0)
     - RCTRequired
     - RCTTypeSafety
     - React-bridging
@@ -1820,6 +1818,77 @@ PODS:
     - React-utils (= 0.87.0)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.87.0)
+  - RNWorklets (0.12.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNWorklets/apple (= 0.12.1)
+    - RNWorklets/common (= 0.12.1)
+    - Yoga
+  - RNWorklets/apple (0.12.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - RNWorklets/common (0.12.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - SocketRocket (0.7.1):
     - ReactNativeDependencies
   - VisionCamera (5.2.3):
@@ -1846,6 +1915,57 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+    - Yoga
+  - VisionCameraResizer (5.2.3):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - VisionCamera
+    - Yoga
+  - VisionCameraWorklets (5.2.3):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNWorklets
+    - VisionCamera
     - Yoga
   - Yoga (0.0.0):
     - React-Core-prebuilt
@@ -1903,7 +2023,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
-  - react-native-ble-plx (from `../node_modules/react-native-ble-plx`)
+  - "react-native-ble-plx (from `../node_modules/@sfourdrinier/react-native-ble-plx`)"
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-network-info (from `../node_modules/react-native-network-info`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1944,14 +2064,16 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
+  - RNWorklets (from `../node_modules/react-native-worklets`)
   - SocketRocket (from `build/rndeps-facades/SocketRocket`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
+  - VisionCameraResizer (from `../node_modules/react-native-vision-camera-resizer`)
+  - VisionCameraWorklets (from `../node_modules/react-native-vision-camera-worklets`)
   - Yoga (from `build/rncore-facades/Yoga`)
 
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
-    - MultiplatformBleAdapter
 
 EXTERNAL SOURCES:
   BonjourZeroconf:
@@ -2058,7 +2180,7 @@ EXTERNAL SOURCES:
   React-mutationobservernativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
   react-native-ble-plx:
-    :path: "../node_modules/react-native-ble-plx"
+    :path: "../node_modules/@sfourdrinier/react-native-ble-plx"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
   react-native-network-info:
@@ -2139,10 +2261,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeDependencies:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
+  RNWorklets:
+    :path: "../node_modules/react-native-worklets"
   SocketRocket:
     :path: build/rndeps-facades/SocketRocket
   VisionCamera:
     :path: "../node_modules/react-native-vision-camera"
+  VisionCameraResizer:
+    :path: "../node_modules/react-native-vision-camera-resizer"
+  VisionCameraWorklets:
+    :path: "../node_modules/react-native-vision-camera-worklets"
   Yoga:
     :path: build/rncore-facades/Yoga
 
@@ -2156,7 +2284,6 @@ SPEC CHECKSUMS:
   fmt: c7776a2a4b1d7ce88b809a1e4d1f7add0f2369df
   glog: b4427c3119645da795ff09985ba9da909c940c96
   hermes-engine: 6a26e94b4a974cbadc751eed9caa12624c38f226
-  MultiplatformBleAdapter: b1fddd0d499b96b607e00f0faa8e60648343dc1d
   NitroImage: 94f8bac6b33126e2f9f9679840b64e29b48b108b
   NitroLocationGeocoder: 9b7d8184684474c937f988d6555e4db49251a141
   NitroModules: 842170ad061f86b22b950cfa91ed55eca99d4e8f
@@ -2200,7 +2327,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 4b91498f164010499357104ef12cb3161ddbec9e
   React-microtasksnativemodule: e0095be041c79483d1d3fded0c682c31d351730f
   React-mutationobservernativemodule: edfe5f0e9548231a767c3a1db6fc52926da0002a
-  react-native-ble-plx: 22a4ebbc88a644b2bca5c56323ede099375bb648
+  react-native-ble-plx: 1e14e982c93f5639202ccdb70e80ddb8de14ccef
   react-native-geolocation: 7318922b2dad168bd23eba154c1392a0b059e9dc
   react-native-network-info: 253a54a48dc8f9ef5abb7a8effdfdef8abd7d875
   react-native-safe-area-context: 352ca3a1d913db1068dcd86669bf60d59608d6eb
@@ -2241,10 +2368,13 @@ SPEC CHECKSUMS:
   ReactCodegen: b54c2a8d91c25df024024b078e9fd3cdf93ce8cf
   ReactCommon: 31d05b76329c8b3c9ef37fff8212f830925a2535
   ReactNativeDependencies: ec5530432d8191b38e278117d498aaff05ea9d6f
+  RNWorklets: 0f21cfc67d4ac5dcd085805b89236cc626a038f6
   SocketRocket: d57b1af80c029e12a75cd9b218287c67381e4593
   VisionCamera: 9fa9f282348778a92e279d5b5913107765bcfcc1
+  VisionCameraResizer: b5f03dec0fb11e2fac7332886f067f9efc16458e
+  VisionCameraWorklets: b49026b44de9fd2a3c7aac5d661eb62d056b4eae
   Yoga: 58b502c52b14ad3c4468805d461fc37d275c2a42
 
-PODFILE CHECKSUM: 849dfc6f13bf4b941d788117baa8ad684cd5a12e
+PODFILE CHECKSUM: f7c39e79779cc94024295a99e37c571d1a44399d
 
 COCOAPODS: 1.15.2

@@ -383,3 +383,15 @@ Potential unavoidable external costs:
 - Google Play registration
 - Domain/server when public deployment requires it
 - Legal review
+
+
+<!-- SWEEPER_M4_COMPLETE -->
+## Milestone 4 closure — Lens / IR Assist
+
+**Status: COMPLETE**
+
+Physical-iPhone validation passed. The final M4 implementation provides a direct camera scanner, explicit camera selection, steady user-controlled Lens scan light, on-device connected-component optical analysis, temporal persistence, IR dark-scene/color gating, evidence capture, and false-positive guidance.
+
+See `MILESTONE_4_VALIDATION.md` for validation details.
+
+**Next: Milestone 5 — GPS-only property identification.**
