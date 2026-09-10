@@ -1,97 +1,74 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Sweeper Mobile
 
-# Getting Started
+This directory is the live React Native 0.87 application for Sweeper.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+For project status, product rules and the 18-milestone plan, start with the repository-root `README.md`, `ROADMAP.md` and `SPEC_STATUS.md`.
 
-## Step 1: Start Metro
+## Install
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+From `mobile/`:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```bash
+npm ci
 ```
 
-## Step 2: Build and run your app
+For iOS after native dependency changes:
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+cd ios && bundle install && bundle exec pod install
 ```
 
-### iOS
+## Run
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Start the backend/PostgreSQL and Metro from the repository root with:
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+./scripts/dev.sh
 ```
 
-Then, and every time you update your native dependencies, run:
+Then launch from Xcode/Android Studio or use:
 
-```sh
-bundle exec pod install
+```bash
+cd mobile && npm run ios
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+or:
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```bash
+cd mobile && npm run android
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Type check
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+npx tsc --noEmit
+```
 
-## Step 3: Modify your app
+## Current native baseline
 
-Now that you have successfully run the app, let's make changes!
+- iOS minimum: 15.1
+- Android minSdk: 26
+- Android compileSdk: 37
+- Android targetSdk: 36
+- Android NDK: 28.2.13676358
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+The current Android foundation has been physically smoke-tested for build/install/Lens execution, but the full Android milestone remains later roadmap work.
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Source layout
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- `src/screens/` — sweep workflow and scanner UI
+- `src/services/networkScanner.ts` — Wi-Fi/LAN discovery and evidence assessment
+- `src/services/bluetoothScanner.ts` / `bleFingerprints.ts` — BLE collection and local device evidence
+- `src/services/lensCv.ts` — on-device Lens/IR optical analysis
+- `src/services/location.ts` — GPS and native reverse-geocoding foundation
+- `src/services/api.ts` — backend submission/photo upload
 
-## Congratulations! :tada:
+`../mobile-overlay/` mirrors project-owned React Native source used by the repository's bootstrap/history workflow. When shared project source changes, keep the corresponding overlay files synchronized.
 
-You've successfully run and modified your React Native App. :partying_face:
+## Development API
 
-### Now what?
+In development, `src/config.ts` derives the backend host from the Metro script URL when possible and uses port 8787. Production currently points at an intentionally invalid placeholder and must be replaced with a real HTTPS endpoint before release.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Detection caution
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Network, BLE and optical signals are evidence clues. They do not prove that a hidden camera exists. Reflective surfaces are a known source of Lens-mode false positives.

@@ -16,3 +16,10 @@ backend/uploads/*
 .milestone3-ble-backup-*/
 .milestone3a-ux-backup-*/
 .milestone3-final-backup-*/
+# Local source-safety snapshots created by repair/refinement scripts
+*.before-*
+
+# Generated mobile build output
+mobile/android/app/build/
+mobile/android/.gradle/
+mobile/ios/DerivedData/

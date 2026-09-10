@@ -7,7 +7,11 @@ if command -v docker >/dev/null 2>&1; then
 fi
 
 cleanup() {
-  jobs -p | xargs -r kill 2>/dev/null || true
+  local pids
+  pids="$(jobs -p || true)"
+  if [[ -n "$pids" ]]; then
+    kill $pids 2>/dev/null || true
+  fi
 }
 trap cleanup EXIT INT TERM
 
@@ -18,5 +22,5 @@ METRO_PID=$!
 
 echo "Backend PID: $BACKEND_PID"
 echo "Metro PID: $METRO_PID"
-echo "Open another terminal and run: cd '$ROOT/mobile' && npm run ios"
+echo "Open another terminal and launch the native app from mobile/."
 wait

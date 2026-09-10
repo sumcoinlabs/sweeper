@@ -1,6 +1,6 @@
 # Milestone 2B - SSDP / UPnP Discovery
 
-Status: FOUNDATION IMPLEMENTED - PHYSICAL IOS MULTICAST VALIDATION PENDING
+Status: FOUNDATION IMPLEMENTED — OPTIONAL IOS SIGNAL; MILESTONE 2 CLOSED
 
 ## Implemented
 
@@ -28,9 +28,9 @@ SSDP produced no useful discovery results on the current test network.
 Independent Mac testing also produced zero SSDP responses from this network.
 
 On iOS, general multicast UDP access may additionally require Apple's
-multicast networking entitlement. Therefore SSDP remains implemented but is
-not considered a universally available iOS discovery method until capability
-testing is completed.
+multicast networking entitlement. SSDP therefore remains implemented as an
+optional signal rather than a requirement for Milestone 2 completion. The core
+scanner was validated without depending on SSDP. See `MILESTONE_2_VALIDATION.md`.
 
 ## Ground-truth network findings
 

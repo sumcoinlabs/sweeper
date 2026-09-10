@@ -44,6 +44,7 @@ permissions = [
     ('android.permission.ACCESS_NETWORK_STATE', None),
     ('android.permission.ACCESS_FINE_LOCATION', None),
     ('android.permission.CAMERA', None),
+    ('android.permission.VIBRATE', None),
     ('android.permission.BLUETOOTH', '30'),
     ('android.permission.BLUETOOTH_ADMIN', '30'),
     ('android.permission.BLUETOOTH_SCAN', None),

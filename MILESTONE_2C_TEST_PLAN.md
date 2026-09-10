@@ -1,6 +1,8 @@
 # Milestone 2C - Host Discovery and Protocol Fingerprinting Test Plan
 
-Status: IMPLEMENTATION UNDER TEST - DO NOT MARK COMPLETE YET
+Status: COMPLETE — archived implementation/physical-test history
+
+Milestone 2 is closed. Final acceptance is summarized in `MILESTONE_2_VALIDATION.md`.
 
 ## Added in this build
 
@@ -44,7 +46,7 @@ so it failed the mandatory RTSP target.
 
 2C.1 changes iOS TCP scanning and protocol exchange to native Network.framework,
 paces and retries ICMP per host, and broadens the whole-subnet baseline port set.
-This remains uncommitted until physical validation passes.
+At that stage it remained uncommitted until physical validation passed.
 
 ## 2C.2 consumer UI simplification
 
@@ -69,37 +71,6 @@ The default Wi-Fi screen is now caution-first and consumer-facing:
 A camera that is live on the LAN but exposes no identifiable service remains
 an unknown host on iOS. Host presence alone is intentionally not treated as
 camera evidence.
-
-## 2C.3 evidence intelligence, export, and reporting guardrail
-
-Physical testing repeatedly confirmed the mandatory RTSP target at
-`192.168.1.226:554` with a standards-compliant `RTSP/1.0 200 OK` response.
-
-This revision explicitly separates:
-1. confidence that a device is network video/camera equipment
-2. confidence that a hidden-camera threat exists at the property
-
-A confirmed RTSP response is strong network-video evidence and is retained for
-backend review. Network evidence alone is never sufficient to label a property
-as a hidden-camera threat because it cannot establish physical placement,
-concealment, or improper use.
-
-The user-facing Wi-Fi screen now:
-- shows only camera/video cautions
-- describes the likely class of equipment in plain language
-- states the evidence strength
-- explains what the finding does and does not prove
-- gives a concrete next step
-- removes raw IP/port/protocol detail from the normal UI
-- supports exporting a shareable report with a technical appendix
-
-Structured assessment/evidence codes are retained in the scan JSON so the
-backend can later correlate network evidence with physical, photo, IR, BLE,
-prior-report, and property evidence.
-
-Future public reporting must require multiple supporting evidence types.
-Confirmed/public warnings remain subject to the specification's verified
-report and repeated-confirmed-report requirements.
 
 ## 2C.3 evidence intelligence, export, and reporting guardrail
 

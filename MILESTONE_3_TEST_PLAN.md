@@ -1,6 +1,8 @@
 # Milestone 3 - BLE Detection Depth Test Plan
 
-Status: IMPLEMENTED FOR PHYSICAL TEST - DO NOT COMMIT AS COMPLETE YET
+Status: COMPLETE — archived test plan and refinement history
+
+Milestone 3 passed physical iPhone validation. See `MILESTONE_3_VALIDATION.md`.
 
 ## What Milestone 3 adds
 
@@ -69,8 +71,8 @@ Required:
 - `[SWEEPER][BLE][OBSERVED]`
 - `[SWEEPER][BLE] complete`
 
-After physical validation, update this file with observed counts and then
-commit/push Milestone 3.
+Physical validation and closeout are now complete. Final observed counts and
+acceptance are recorded in `MILESTONE_3_VALIDATION.md`.
 
 ## M3 UX/intelligence refinement after first physical test
 
