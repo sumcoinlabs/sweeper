@@ -14,6 +14,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BD87CCE638A9E4CAC6A61EE8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		F107F151CECF9F49953FC770 /* sweeper_lock.wav in Resources */ = {isa = PBXBuildFile; fileRef = A0573A5724C03637A86FBC2A /* sweeper_lock.wav */; };
+		FAF8F975130A0EA25E48DEE5 /* sweeper_possible.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9B338B8AE6D71EA603426486 /* sweeper_possible.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,7 +28,9 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-SweeperMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SweeperMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SweeperMobile/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SweeperMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9B338B8AE6D71EA603426486 /* sweeper_possible.wav */ = {isa = PBXFileReference; includeInIndex = 1; path = SweeperMobile/sweeper_possible.wav; sourceTree = "<group>"; };
 		A041E93D40C40E5B0CC9C180 /* SweeperSSDP.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SweeperSSDP.swift; path = SweeperMobile/SweeperSSDP.swift; sourceTree = "<group>"; };
+		A0573A5724C03637A86FBC2A /* sweeper_lock.wav */ = {isa = PBXFileReference; includeInIndex = 1; path = SweeperMobile/sweeper_lock.wav; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EF6C56955960395A3759908D /* SweeperSSDPBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SweeperSSDPBridge.m; path = SweeperMobile/SweeperSSDPBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -53,6 +57,8 @@
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				A041E93D40C40E5B0CC9C180 /* SweeperSSDP.swift */,
 				EF6C56955960395A3759908D /* SweeperSSDPBridge.m */,
+				9B338B8AE6D71EA603426486 /* sweeper_possible.wav */,
+				A0573A5724C03637A86FBC2A /* sweeper_lock.wav */,
 			);
 			name = SweeperMobile;
 			sourceTree = "<group>";
@@ -167,6 +173,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BD87CCE638A9E4CAC6A61EE8 /* PrivacyInfo.xcprivacy in Resources */,
+				FAF8F975130A0EA25E48DEE5 /* sweeper_possible.wav in Resources */,
+				F107F151CECF9F49953FC770 /* sweeper_lock.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

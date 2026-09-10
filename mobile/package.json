@@ -21,6 +21,7 @@
     "react-native-nitro-image": "^0.15.2",
     "react-native-nitro-modules": "^0.37.0",
     "react-native-safe-area-context": "^5.5.2",
+    "react-native-sound": "0.13.0",
     "react-native-tcp-socket": "^6.4.2",
     "react-native-vision-camera": "^5.2.3",
     "react-native-vision-camera-resizer": "5.2.3",
